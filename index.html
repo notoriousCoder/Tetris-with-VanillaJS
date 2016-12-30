@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <title>Title</title>
+  <link type="text/css" href="./assets/css/styles.css" rel="stylesheet" >
+  <link type="text/css" href="./assets/css/xeicon.min.css" rel="stylesheet">
+  <script type="text/javascript" src="./assets/js/jquery.1.12.4.min.js"></script>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <div class="section_title">
+      <div class="inner_title">
+        <h1 id="title">
+          <b class="red">T</b>
+          <b class="orange">E</b>
+          <b class="yellow">T</b>
+          <b class="green">R</b>
+          <b class="blue">I</b>
+          <b class="purple">S</b>
+        </h1>
+      </div>
+    </div>
+    <div class="btn_gnb"><i id="iconBtnGnb" class="xi-list-dot xi-4x"></i></div>
+    <div class="section_gnb">
+      <div id="bgCover"></div>
+      <div class="inner_gnb">
+        <div class="area_sns"></div>
+        <ul id="gnb">
+          <li class="on"><a href="#">Single Mode</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div id="contents">
+      <div id="alertLayerPopup">
+        <div id="layerPopupCover"></div>
+        <div class="wrap_window">
+          <div class="section_alert_title">
+            <p class="inner_alert_title">
+              <i id="alertIcon" class="xi-2x"></i>
+              <span id="alertTitle"></span>
+              <i id="layerPopupCloseBtn" class="xi-close-circle-o xi-2x"></i>
+            </p>
+          </div>
+          <div class="section_alert_message">
+            <p id="alertMessage"></p>
+          </div>
+        </div>
+      </div>
+      <div class="screen_user">
+        <div class="wrap_map">
+          <div class="inner_map">
+            <div class="section_score">
+              <div class="wrap_score">
+                <i class="xi-gamepad xi-2x"></i>
+                <span id="score">0</span>
+              </div>
+              <div class="wrap_combo">
+                <i id="comboIcon" class="xi-emoticon-bad-o xi-2x"></i>
+                <span id="combo">0</span>
+              </div>
+            </div>
+            <div id="currentBlock"></div>
+            <div id="map"></div>
+          </div>
+          <div class="section_preview">
+            <div id="gameBtn">
+              <i class="xi-border-clear xi-3x red"></i>
+              <span class="orange">S</span>
+              <span class="yellow">T</span>
+              <span class="green">A</span>
+              <span class="blue">R</span>
+              <span class="purple">T</span>
+            </div>
+            <div id="nextBlock">
+              <i class="xi-reply-all xi-2x"></i><span>NEXT BLOCK</span>
+            </div>
+            <div id="previewCurrent" class="block"></div>
+            <div id="previewNext" class="block"></div>
+          </div>
+        </div>
+        <div class="wrap_keypad">
+          <div id="putKey" class="key"><i class="xi-touch xi-2x"></i></div>
+          <div id="swapKey" class="key"><i class="xi-catched xi-2x"></i></div>
+          <div id="leftKey" class="key"><i class="xi-arrow-left xi-2x"></i></div>
+          <div id="upKey" class="key"><i class="xi-undo xi-2x"></i></div>
+          <div id="downKey" class="key"><i class="xi-arrow-down xi-2x"></i></div>
+          <div id="rightKey" class="key"><i class="xi-arrow-right xi-2x"></i></div>
+        </div>
+      </div>
+      <div class="screen_others">
+      </div>
+    </div>
+  </div>
+  <div id="footer"></div>
+</div>
+<script type="text/javascript">
+  window.addEventListener('load', function()
+  {
+    document.body.style.height = (document.documentElement.clientHeight + 50) + 'px';
+    setTimeout(function()
+    {
+      window.scrollTo(0, 1);
+    }, false)
+  }, false);
+</script>
+<script type="text/javascript" src="assets/js/tetris.js"></script>
+</body>
+</html>
