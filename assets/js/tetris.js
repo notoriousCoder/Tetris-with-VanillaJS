@@ -267,6 +267,9 @@ document.addEventListener('DOMContentLoaded', function()
 	 */
 	function startGame()
 	{
+		document.getElementById('score').innerText = '0';
+		document.getElementById('combo').innerText = '0';
+		document.getElementById('currentBlock').innerHTML = '';
 		game = new Game();
 		game.map = new Map('map');
 		game.map.initMap();
