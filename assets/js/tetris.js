@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function()
 			{
 				tempCol = { blockIndex: -1, blockColor: '#bdbdbd' };
 				tempColHtml.style.backgroundColor = tempCol.blockColor;
-				tempColHtml.style.border = '4px inset ' + tempCol.blockColor;
+				tempColHtml.style.border = '4px outset ' + tempCol.blockColor;
 				tempColHtml.setAttribute('data-index', tempCol.blockIndex);
 			}
 			tempRow.push(tempCol);
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function()
 				{
 					tempCol.classList.add('col');
 					tempCol.style.backgroundColor = block[i][j].color;
-					tempCol.style.border = '4px inset ' + block[i][j].color;
+					tempCol.style.border = '4px outset ' + block[i][j].color;
 				}
 			}
 			tempBlock.appendChild(tempRow);
@@ -220,16 +220,13 @@ document.addEventListener('DOMContentLoaded', function()
 			tempRow.classList.add('row');
 			for(var j = 0; j < block[0].length; j++)
 			{
-				if(document.getElementById(target).children[row].children[col].getAttribute('data-index') != null)
-					return false;
-
 				var tempCol = document.createElement('div');
 				tempCol.classList.add('col');
 				tempRow.appendChild(tempCol);
 				if(block[i][j] != null)
 				{
 					tempCol.style.backgroundColor = block[i][j].color;
-					tempCol.style.border = '4px inset ' + block[i][j].color;
+					tempCol.style.border = '4px outset ' + block[i][j].color;
 				}
 			}
 			currentBlock.appendChild(tempRow);
@@ -247,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function()
 			{
 				if(game.map.form[i][j] != null)
 				{
-					document.getElementById(target).children[i].children[j].style.border = '4px inset ' + game.map.form[i][j].color;
+					document.getElementById(target).children[i].children[j].style.border = '4px outset ' + game.map.form[i][j].color;
 					document.getElementById(target).children[i].children[j].style.backgroundColor = game.map.form[i][j].color;
 					document.getElementById(target).children[i].children[j].setAttribute('data-index', game.map.form[i][j].blockIndex);
 				}
