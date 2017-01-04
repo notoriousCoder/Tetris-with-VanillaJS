@@ -12,6 +12,65 @@ document.addEventListener('DOMContentLoaded', function()
 	game.map = new Map('map');
 	game.map.initMap();
 
+	function gameOver()
+	{
+		clearInterval(game.scoreIntervalId);
+		clearInterval(game.autoDownIntervalId);
+		clearInterval(game.hurdleIntervalId);
+		alertMessage('GameOver..', 'information');
+		document.getElementById('gameBtn').click();
+		return false;
+	}
+	function hurdleInterval()
+	{
+		if(game.position.row < 0)
+		{
+			var rowIdx = Math.abs(game.position.row);
+			for(var i = 0; i < game.currentBlock[rowIdx].length; i++)
+			{
+				if(game.currentBlock[rowIdx][i] != null && game.map.form[rowIdx][i + game.position.col] != null)
+				{
+					game.flag = false;
+				}
+			}
+		}
+		for(var idx in game.map.form[0])
+		{
+			if(game.map.form[0][idx] != null)
+			{
+				game.flag = false;
+			}
+		}
+
+		var tempRow = [];
+		var tempRowHtml = document.createElement('div');
+		tempRowHtml.classList.add('row');
+		for(var i = 0; i < game.map.colSize; i++)
+		{
+			var tempColHtml = document.createElement('div');
+			tempColHtml.classList.add('col');
+			tempRowHtml.appendChild(tempColHtml);
+			var tempCol = null;
+			if(Math.round(Math.random() * 1))
+			{
+				tempCol = { blockIndex: -1, blockColor: '#bdbdbd' };
+				tempColHtml.style.backgroundColor = tempCol.blockColor;
+				tempColHtml.style.border = '4px inset ' + tempCol.blockColor;
+				tempColHtml.setAttribute('data-index', tempCol.blockIndex);
+			}
+			tempRow.push(tempCol);
+		}
+		game.map.form.shift();
+		game.map.form.push(tempRow);
+		document.getElementById(game.map.target).removeChild(document.getElementById(game.map.target).firstChild);
+		document.getElementById(game.map.target).appendChild(tempRowHtml);
+
+		if(game.flag == false)
+		{
+			gameOver();
+			return false;
+		}
+	}
 	function scoreInterval()
 	{
 		game.score += 10;
@@ -54,20 +113,23 @@ document.addEventListener('DOMContentLoaded', function()
 		document.getElementById('comboIcon').className = '';
 		document.getElementById('comboIcon').classList.add('xi-2x');
 		document.getElementById('comboIcon').classList.add(comboIcon);
+
+		if(game.flag == false)
+		{
+			gameOver();
+			return false;
+		}
 	}
 	function autoDownInterval()
 	{
-		if(game.flag == false)
-		{
-			clearInterval(game.scoreIntervalId);
-			clearInterval(game.autoDownIntervalId);
-			alertMessage('GameOver..', 'information');
-			document.getElementById('gameBtn').click();
-			return false;
-		}
 		game.downBlock();
 		drawMap(game.map.target);
 		drawBlock(game.map.target, game.currentBlock, game.position.row, game.position.col);
+		if(game.flag == false)
+		{
+			gameOver();
+			return false;
+		}
 	}
 	function keyDownEvent()
 	{
@@ -158,6 +220,9 @@ document.addEventListener('DOMContentLoaded', function()
 			tempRow.classList.add('row');
 			for(var j = 0; j < block[0].length; j++)
 			{
+				if(document.getElementById(target).children[row].children[col].getAttribute('data-index') != null)
+					return false;
+
 				var tempCol = document.createElement('div');
 				tempCol.classList.add('col');
 				tempRow.appendChild(tempCol);
@@ -208,12 +273,14 @@ document.addEventListener('DOMContentLoaded', function()
 		game.score = 0;
 		game.scoreIntervalId = null;
 		game.autoDownIntervalId = null;
+		game.hurdleIntervalId = null;
 		document.addEventListener('keydown', keyDownEvent);
 		document.addEventListener('keyup', keyUpEvent);
 		game.currentBlock = game.createBlock();
 		game.nextBlock = game.createBlock();
 		game.scoreIntervalId = setInterval(scoreInterval, 2000);
 		game.autoDownIntervalId = setInterval(autoDownInterval, 1000);
+		game.hurdleIntervalId = setInterval(hurdleInterval, 15000);
 		drawPreviewBlock('previewCurrent', game.currentBlock);
 		drawPreviewBlock('previewNext', game.nextBlock);
 
@@ -235,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function()
 		document.removeEventListener('keyup', keyUpEvent);
 		clearInterval(game.scoreIntervalId);
 		clearInterval(game.autoDownIntervalId);
+		clearInterval(game.hurdleIntervalId);
 
 		/* Mobile */
 		document.getElementById('upKey').removeEventListener('click', upKeyEvent);
@@ -405,7 +473,7 @@ Game.prototype.checkStuck = function(block, row, col)
 		this.position.col = col;
 		return true;
 	}
-	// if there is a block above the map, change startIdx from 0 to that value.
+	// if there is a part of block over the map, change startIdx from 0 to that value.
   if(row < 0)
 		startIdx = Math.abs(row);
 
