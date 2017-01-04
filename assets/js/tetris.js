@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function()
 	{
 		game.score += 10;
 	  document.getElementById('score').innerText = (game.score + '').replace(/(\d)(?=(?:\d{3})+(?!\d))/g,'$1,');
+		// choose max combo icon.
 		var comboIcon = 'xi-emoticon-bad-o';
 		switch(game.maxCombo)
 		{
@@ -70,11 +71,12 @@ document.addEventListener('DOMContentLoaded', function()
 	}
 	function keyDownEvent()
 	{
-		if((new Date().getTime() - game.lastControllTime) < 400)
+		if((new Date().getTime() - game.lastControllTime) < 400 && event.keyCode == game.lastControllValue)
 			return false;
 		else
 			game.lastControllTime = new Date().getTime();
 
+		game.lastControllValue = event.keyCode;
 		switch(event.keyCode)
 		{
 			case 17: // ctrl
@@ -278,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function()
 		}
 	}
 
-	/* Mobile*/
+	/* for Mobile*/
 	function upKeyEvent()
 	{
 		var copyBlock = [];
@@ -329,26 +331,32 @@ document.addEventListener('DOMContentLoaded', function()
 		drawPreviewBlock('previewNext', game.nextBlock);
 	}
 });
+/**
+ * Constructor of Game Class.
+ * @constructor
+ */
 function Game()
 {
-	this.map = null;
-	this.flag = true;
-	this.lastControllTime = null;
-	this.nextBlock = null;
-	this.currentBlock = null;
-	this.blockIndex = 0;
-	this.position = {col: 0, row: 0};
-	this.isCombo = false;
-	this.combo = 0;
-	this.maxCombo = 0;
+	this.map = null;												// root element
+	this.flag = true;												// game flag: true=live, false=die.
+	this.lastControllTime = null;						// lastKeyDownTime
+	this.lastControllValue = null;					// lastKeyDownValue(keyCode)
+	this.nextBlock = null;									// next block
+	this.currentBlock = null;								// current block
+	this.blockIndex = 0;										// block index
+	this.position = {col: 0, row: 0};				// current block position.
+	this.isCombo = false;										// combo flag
+	this.combo = 0;													// combo count
+	this.maxCombo = 0;											// max combo
 }
 /**
  * create block from BLOCK_FORMS.
  */
 Game.prototype.createBlock = function()
 {
-	var form = BLOCK_FORMS[Math.floor(Math.random() * BLOCK_FORMS.length)];
-	var properties = {blockIndex: this.blockIndex++, color: COLORS[Math.floor(Math.random() * COLORS.length)]};
+	var block = BLOCK_FORMS[Math.floor(Math.random() * BLOCK_FORMS.length)];
+	var form = block.form;
+	var properties = {blockIndex: this.blockIndex++, color: block.color};
 	var result = [];
 	for(var idx in form)
 	{
@@ -369,11 +377,15 @@ Game.prototype.createBlock = function()
 	}
 	return result;
 };
+/**
+ * Check possible before move block or turn block or build block.
+ */
 Game.prototype.checkStuck = function(block, row, col)
 {
 	var startIdx = 0;
 	var rowIdx = row;
 	var colIdx = col;
+	// out of range - return false.
 	if(col < 0)
 		return false;
 	if((col + block[0].length - 1) > this.map.colSize - 1)
@@ -386,6 +398,7 @@ Game.prototype.checkStuck = function(block, row, col)
 		this.position.col = col;
 		return true;
 	}
+	// if there is a block above the map, change startIdx from 0 to that value.
   if(row < 0)
 		startIdx = Math.abs(row);
 
@@ -401,6 +414,11 @@ Game.prototype.checkStuck = function(block, row, col)
 	this.position.col = col;
 	return true;
 };
+/**
+ * print game.map.form in developer's console.
+ * ' ' is nothing block.
+ * '*' is exist block.
+ */
 Game.prototype.printMap = function()
 {
 	var text = '';
@@ -416,11 +434,15 @@ Game.prototype.printMap = function()
 	}
 	console.log(text);
 };
+/**
+ * Build a block at the current position on the map.
+ */
 Game.prototype.buildBlock = function()
 {
 	var startIdx = 0;
 	var position = this.position;
 	var block = this.currentBlock;
+	// build block
 	if(this.position.row < 0)
 		startIdx = Math.abs(this.position.row);
   for(var i = startIdx; i < block.length; i++)
@@ -440,6 +462,7 @@ Game.prototype.buildBlock = function()
 		return false;
 	}
 
+	// Calculate combo and score.
 	this.currentBlock = this.nextBlock;
 	this.nextBlock = this.createBlock();
 	this.isCombo = false;
@@ -475,18 +498,21 @@ Game.prototype.buildBlock = function()
 			document.getElementById(this.map.target).children[0].before(tempRow);
 		}
 	}
+	// If the combo larger than 1, add bonus score.
 	if(this.isCombo && ++this.combo > 1)
 	{
 		if(this.combo > this.maxCombo)
 			this.maxCombo = this.combo;
 		this.score += Math.round(this.combo * (100 * (1 + (this.combo / 10).toFixed(2))));
+
+		document.getElementById('score').innerText = (game.score + '').replace(/(\d)(?=(?:\d{3})+(?!\d))/g,'$1,');
+		document.getElementById('combo').innerText = this.combo + '';
 	}
 	else if(!this.isCombo)
 	{
+		// Init combo
 		this.combo = 0;
 	}
-	document.getElementById('score').innerText = (game.score + '').replace(/(\d)(?=(?:\d{3})+(?!\d))/g,'$1,');
-	document.getElementById('combo').innerText = this.combo + '';
 };
 Game.prototype.downBlock = function()
 {
@@ -551,18 +577,27 @@ Game.prototype.halfTurnBlock = function(block)
 	return turnedBlock;
 };
 /**
- * Map Class.
+ * Constructor of Map Class.
+ *
+ * @param target:  default = map
+ * @param rowSize: default = 20
+ * @param colSize: default = 10
+ * @returns {null}
+ * @constructor
  */
 function Map(target, rowSize, colSize)
 {
 	if(target == null || document.getElementById(target) == null)
 		return null;
 
-	this.target = target;
+	this.target = target || 'map';
 	this.rowSize = rowSize || 20;
 	this.colSize = colSize || 10;
 	this.form = [];
 }
+/**
+ * Removes all child element of the root element.
+ */
 Map.prototype.emptyMap = function()
 {
 	var target = document.getElementById(this.target);
@@ -573,81 +608,105 @@ Map.prototype.emptyMap = function()
 		target.removeChild(target.firstChild);
 	this.form = [];
 };
+/**
+ * Draw map.(form = rowSize * colSize, value = null)
+ */
 Map.prototype.drawMap = function()
 {
 	var fragment = document.createDocumentFragment();
 	for(var i = 0; i < this.rowSize; i++)
 	{
-		var mapFormRow = [];
-		var rowElement = document.createElement('div');
-		rowElement.classList.add('row');
+		var row = [];
+		var rowHtml = document.createElement('div');
+		rowHtml.classList.add('row');
 		for(var j = 0; j < this.colSize; j++)
 		{
-			mapFormRow.push(null);
-			var colElement = document.createElement('div');
-			colElement.classList.add('col');
-			rowElement.appendChild(colElement);
+			row.push(null);
+			var colHtml = document.createElement('div');
+			colHtml.classList.add('col');
+			rowHtml.appendChild(colHtml);
 		}
-		this.form.push(mapFormRow);
-		fragment.appendChild(rowElement);
+		this.form.push(row);
+		fragment.appendChild(rowHtml);
 	}
 	document.getElementById(this.target).appendChild(fragment);
 };
+/**
+ * Execute - empty map, draw new map.
+ */
 Map.prototype.initMap = function()
 {
 	this.emptyMap();
 	this.drawMap();
 };
-var COLORS =
-[
-	'#ff0000',
-	'#ffa500',
-	'#ffe400',
-	'#32cd32',
-	'#0000ff',
-	'#000080',
-	'#800080'
-];
 /**
- * block forms variable.
+ * Block forms.
  */
 var BLOCK_FORMS =
 [
-	[
-		[ 1, 1 ],
-		[ 1, 1 ]
-	],
-	[
-		[ 1 ],
-		[ 1 ],
-		[ 1 ],
-		[ 1 ]
-	],
-	[
-		[ 1, 0 ],
-		[ 1, 1 ],
-		[ 1, 0 ]
-	],
-	[
-		[ 1, 0 ],
-		[ 1, 1 ],
-		[ 0, 1 ]
-	],
-	[
-		[ 0, 1 ],
-		[ 1, 1 ],
-		[ 1, 0 ]
-	],
-	[
-		[ 1, 1 ],
-		[ 0, 1 ],
-		[ 0, 1 ]
-	],
-	[
-		[ 1, 1 ],
-		[ 1, 0 ],
-		[ 1, 0 ]
-	]
+	{
+		form:
+		[
+			[ 1, 1 ],
+			[ 1, 1 ]
+		],
+		color: '#ff0000'
+	},
+	{
+		form:
+		[
+			[ 1 ],
+			[ 1 ],
+			[ 1 ],
+			[ 1 ]
+		],
+		color: '#ffa500'
+	},
+	{
+		form:
+		[
+			[ 1, 0 ],
+			[ 1, 1 ],
+			[ 0, 1 ]
+		],
+		color: '#ffe400'
+	},
+	{
+		form:
+		[
+			[ 0, 1 ],
+			[ 1, 1 ],
+			[ 1, 0 ]
+		],
+		color: '#32cd32'
+	},
+	{
+		form:
+		[
+			[ 1, 1 ],
+			[ 0, 1 ],
+			[ 0, 1 ]
+		],
+		color: '#0000ff'
+	},
+	{
+		form:
+		[
+			[ 1, 1 ],
+			[ 1, 0 ],
+			[ 1, 0 ]
+		],
+		color: '#000080'
+	},
+	{
+		form:
+		[
+			[ 1, 0 ],
+			[ 1, 1 ],
+			[ 1, 0 ]
+		],
+		color: '#800080'
+	}
 ];
 /**
  * This function show alert message layer popup
