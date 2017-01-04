@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function()
 				{
 					tempCol.classList.add('col');
 					tempCol.style.backgroundColor = block[i][j].color;
+					tempCol.style.border = '4px inset ' + block[i][j].color;
 				}
 			}
 			tempBlock.appendChild(tempRow);
@@ -163,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function()
 				if(block[i][j] != null)
 				{
 					tempCol.style.backgroundColor = block[i][j].color;
+					tempCol.style.border = '4px inset ' + block[i][j].color;
 				}
 			}
 			currentBlock.appendChild(tempRow);
@@ -180,8 +182,13 @@ document.addEventListener('DOMContentLoaded', function()
 			{
 				if(game.map.form[i][j] != null)
 				{
+					document.getElementById(target).children[i].children[j].style.border = '4px inset ' + game.map.form[i][j].color;
 					document.getElementById(target).children[i].children[j].style.backgroundColor = game.map.form[i][j].color;
 					document.getElementById(target).children[i].children[j].setAttribute('data-index', game.map.form[i][j].blockIndex);
+				}
+				else
+				{
+					document.getElementById(target).children[i].children[j].style.border = '1px dotted #747474';
 				}
 			}
 		}
@@ -647,20 +654,28 @@ var BLOCK_FORMS =
 	{
 		form:
 		[
+			[ 0, 1 ],
 			[ 1, 1 ],
-			[ 1, 1 ]
+			[ 1, 0 ]
 		],
 		color: '#ff0000'
 	},
 	{
 		form:
 		[
-			[ 1 ],
-			[ 1 ],
-			[ 1 ],
-			[ 1 ]
+			[ 1, 1 ],
+			[ 0, 1 ],
+			[ 0, 1 ]
 		],
-		color: '#ffa500'
+		color: '#ff9436'
+	},
+	{
+		form:
+		[
+			[ 1, 1 ],
+			[ 1, 1 ]
+		],
+		color: '#ffe400'
 	},
 	{
 		form:
@@ -669,23 +684,15 @@ var BLOCK_FORMS =
 			[ 1, 1 ],
 			[ 0, 1 ]
 		],
-		color: '#ffe400'
-	},
-	{
-		form:
-		[
-			[ 0, 1 ],
-			[ 1, 1 ],
-			[ 1, 0 ]
-		],
 		color: '#32cd32'
 	},
 	{
 		form:
 		[
-			[ 1, 1 ],
-			[ 0, 1 ],
-			[ 0, 1 ]
+			[ 1 ],
+			[ 1 ],
+			[ 1 ],
+			[ 1 ]
 		],
 		color: '#0000ff'
 	},
